@@ -442,35 +442,35 @@
 
       .project-thumbnail {
         width: 100%;
-        height: 200px;
+        height: 250px;
         background: linear-gradient(135deg, var(--accent) 0%, #8b5cf6 100%);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 4rem;
         position: relative;
         overflow: hidden;
       }
 
-      .project-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
+      .project-thumbnail img {
         width: 100%;
         height: 100%;
-        background: rgba(0, 0, 0, 0.8);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        opacity: 0;
+        object-fit: cover;
         transition: var(--transition);
       }
 
-      .project-card:hover .project-overlay {
-        opacity: 1;
+      .project-card:hover .project-thumbnail img {
+        transform: scale(1.05);
+      }
+
+      .project-thumbnail-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 4rem;
+        background: linear-gradient(135deg, var(--accent) 0%, #8b5cf6 100%);
       }
 
       .view-btn {
+        display: inline-block;
         padding: 12px 30px;
         background: var(--accent);
         color: var(--bg-primary);
@@ -478,18 +478,26 @@
         border-radius: 50px;
         font-weight: 600;
         transition: var(--transition);
+        margin-top: 15px;
+        cursor: pointer;
       }
 
       .view-btn:hover {
-        transform: scale(1.1);
+        transform: translateY(-3px);
+        box-shadow: 0 5px 20px var(--accent-glow);
       }
+
       .view-btn.disabled {
-        background: #94a3b8; /* slate gray */
-        color: #0f172a;
+        background: #64748b;
+        color: #f1f5f9;
         cursor: not-allowed;
-        opacity: 0.8;
-        transform: none;
+        opacity: 0.6;
         pointer-events: none;
+      }
+
+      .view-btn.disabled:hover {
+        transform: none;
+        box-shadow: none;
       }
 
       .project-info {
@@ -985,35 +993,35 @@
           description:
             "A secure authentication system with modern UI/UX, featuring login, signup, and password reset functionality.",
           link: "https://common-computer-issues.vercel.app/",
-          icon: "🔐",
+          thumbnail: "https://images.pexels.com/photos/60504/security-protection-anti-virus-software-60504.jpeg?auto=compress&cs=tinysrgb&w=800",
         },
         {
           title: "Tech Docs Blog",
           description:
             "A clean and minimalist blog platform for technical documentation and tutorials with markdown support.",
           link: "#",
-          icon: "📝",
+          thumbnail: "https://images.pexels.com/photos/1181472/pexels-photo-1181472.jpeg?auto=compress&cs=tinysrgb&w=800",
         },
         {
           title: "Threat Analytics Dashboard",
           description:
             "Real-time cybersecurity dashboard displaying threat intelligence and security metrics.",
           link: "#",
-          icon: "🛡️",
+          thumbnail: "https://images.pexels.com/photos/5380664/pexels-photo-5380664.jpeg?auto=compress&cs=tinysrgb&w=800",
         },
         {
           title: "Startup Landing Page",
           description:
             "High-converting landing page with modern animations and responsive design for startups.",
           link: "#",
-          icon: "🚀",
+          thumbnail: "https://images.pexels.com/photos/3184292/pexels-photo-3184292.jpeg?auto=compress&cs=tinysrgb&w=800",
         },
         {
           title: "Security Docs Hub",
           description:
             "Comprehensive security documentation platform with best practices and guidelines.",
           link: "#",
-          icon: "📚",
+          thumbnail: "https://images.pexels.com/photos/1181263/pexels-photo-1181263.jpeg?auto=compress&cs=tinysrgb&w=800",
         },
       ];
 
@@ -1051,7 +1059,6 @@
       }
 
       function renderProjects(projects) {
-        // Clear grid then build DOM nodes to avoid HTML-escaping issues and to compute safe hrefs
         portfolioGrid.innerHTML = "";
         projects.forEach((project) => {
           const card = document.createElement("div");
@@ -1059,10 +1066,19 @@
 
           const thumb = document.createElement("div");
           thumb.className = "project-thumbnail";
-          const iconSpan = document.createElement("span");
-          iconSpan.style.fontSize = "4rem";
-          iconSpan.textContent = project.icon || "";
-          thumb.appendChild(iconSpan);
+
+          if (project.thumbnail) {
+            const img = document.createElement("img");
+            img.src = project.thumbnail;
+            img.alt = project.title || "Project thumbnail";
+            img.loading = "lazy";
+            thumb.appendChild(img);
+          } else {
+            const placeholder = document.createElement("div");
+            placeholder.className = "project-thumbnail-placeholder";
+            placeholder.textContent = project.icon || "🖼️";
+            thumb.appendChild(placeholder);
+          }
 
           const info = document.createElement("div");
           info.className = "project-info";
@@ -1078,22 +1094,23 @@
           info.appendChild(title);
           info.appendChild(desc);
 
-          // Always render a "View Live" anchor under each project.
-          // If normalizeLink returns a usable URL we'll open in a new tab,
-          // otherwise use the provided link (may be '#').
           const safeHref = normalizeLink(project.link);
-          // Use a no-op href for invalid links to avoid jumping to top (#) which acts like a "home" navigation.
           const hrefToUse = safeHref || "javascript:void(0)";
           const a = document.createElement("a");
           a.className = "view-btn";
-          a.style.display = "block";
-          a.style.marginTop = "18px";
+
+          if (!safeHref) {
+            a.classList.add("disabled");
+          }
+
           a.href = hrefToUse;
           a.textContent = "View Live";
+
           if (safeHref) {
             a.target = "_blank";
             a.rel = "noopener noreferrer";
           }
+
           info.appendChild(a);
 
           card.appendChild(thumb);
