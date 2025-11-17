@@ -1,0 +1,8 @@
+{
+  "name": "victor-portfolio",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Static portfolio site - no build tool required",
+  "scripts": {},
+  "keywords": ["portfolio", "static"]
+}
